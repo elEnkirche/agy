@@ -33,8 +33,8 @@ export default defineConfig({
   build: {
     rollupOptions: {
       input: {
-        main: path.resolve(__dirname, "index.html"),
-        agy: path.resolve(__dirname, "agy.html"),
+        main: path.resolve(__dirname, "app.html"),
+        overlay: path.resolve(__dirname, "overlay.html"),
       },
     },
   },

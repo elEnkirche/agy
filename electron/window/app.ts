@@ -16,8 +16,8 @@ export function createAppWindow(dirname: string): BrowserWindow {
   });
 
   if (process.env.VITE_DEV_SERVER_URL)
-    win.loadURL(process.env.VITE_DEV_SERVER_URL);
-  else win.loadFile(path.join(dirname, "../dist/index.html"));
+    win.loadURL(`${process.env.VITE_DEV_SERVER_URL}/app.html`);
+  else win.loadFile(path.join(dirname, "../dist/app.html"));
 
   return win;
 }

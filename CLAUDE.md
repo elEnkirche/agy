@@ -33,15 +33,15 @@ AGY is a macOS vocal assistant that controls your desktop through voice commands
                       IPC (preload.ts)
 ┌───────────────────────────┴───────────────────────────────────┐
 │                   Renderer Processes                          │
-│  index.html → src/main.tsx → pages/settings/   (App window)  │
-│  agy.html   → pages/overlay/main.tsx           (Overlay)     │
+│  app.html     → src/main.tsx → pages/settings/ (App window)  │
+│  overlay.html → pages/overlay/main.tsx         (Overlay)     │
 └───────────────────────────────────────────────────────────────┘
 ```
 
 ### Two Windows
 
-- **App window** (`index.html`): 640x460 settings UI with sidebar nav (Audio, Hotkey, Appearance, Permissions). Also drives audio recording and assistant event listeners.
-- **Overlay window** (`agy.html`): Fullscreen transparent frameless always-on-top HUD. Click-through (`setIgnoreMouseEvents(true)`), content-protected (invisible to screenshots). Shows animated border glow + conversation. Auto-hides after 3s idle. Repositions to the display where the cursor is.
+- **App window** (`app.html`): 640x460 settings UI with sidebar nav (Audio, Hotkey, Appearance, Permissions). Also drives audio recording and assistant event listeners.
+- **Overlay window** (`overlay.html`): Fullscreen transparent frameless always-on-top HUD. Click-through (`setIgnoreMouseEvents(true)`), content-protected (invisible to screenshots). Shows animated border glow + conversation. Auto-hides after 3s idle. Repositions to the display where the cursor is.
 
 ## Voice Pipeline
 
