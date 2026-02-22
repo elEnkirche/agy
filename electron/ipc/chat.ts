@@ -10,24 +10,24 @@ import {
 } from "../lib/ai.js";
 import { toolDefinitions, executeTool } from "../lib/tools.js";
 import { captureContext } from "../lib/context.js";
-import { showAgyOnCursorDisplay } from "../window/agy.js";
+import { showOverlayOnCursorDisplay } from "../window/overlay.js";
 
 export function registerChatHandlers(
   getAppWindow: () => BrowserWindow | null,
-  getAgyWindow: () => BrowserWindow | null,
+  getOverlayWindow: () => BrowserWindow | null,
 ) {
   ipcMain.handle("chat-with-mistral", async (_event, prompt: string) => {
     const appWindow = getAppWindow();
     if (!appWindow || !prompt.trim()) return;
 
-    const sendAgy = (channel: string, ...args: unknown[]) =>
-      getAgyWindow()?.webContents.send(channel, ...args);
+    const sendOverlay = (channel: string, ...args: unknown[]) =>
+      getOverlayWindow()?.webContents.send(channel, ...args);
 
-    const agyWin = getAgyWindow();
-    if (agyWin && !agyWin.isDestroyed() && !agyWin.isVisible())
-      showAgyOnCursorDisplay(agyWin);
+    const overlayWin = getOverlayWindow();
+    if (overlayWin && !overlayWin.isDestroyed() && !overlayWin.isVisible())
+      showOverlayOnCursorDisplay(overlayWin);
 
-    sendAgy("glow-phase", "thinking");
+    sendOverlay("glow-phase", "thinking");
 
     // Capture context (overlay is content-protected, won't appear in screenshot)
     const ctx = await captureContext();
@@ -69,7 +69,7 @@ export function registerChatHandlers(
           if (typeof delta.content === "string" && delta.content) {
             textContent += delta.content;
             appWindow.webContents.send("chat-chunk", delta.content);
-            sendAgy("chat-chunk", delta.content);
+            sendOverlay("chat-chunk", delta.content);
           }
 
           if (delta.toolCalls) {
@@ -114,7 +114,7 @@ export function registerChatHandlers(
 
             const payload = { name: tc.function.name, arguments: args };
             appWindow.webContents.send("tool-executing", payload);
-            sendAgy("tool-executing", payload);
+            sendOverlay("tool-executing", payload);
 
             const result = await executeTool(tc.function.name, args);
 
@@ -134,7 +134,7 @@ export function registerChatHandlers(
         }
       }
     } finally {
-      sendAgy("glow-phase", "idle");
+      sendOverlay("glow-phase", "idle");
     }
   });
 }

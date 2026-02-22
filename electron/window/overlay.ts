@@ -1,7 +1,7 @@
 import { BrowserWindow, screen } from "electron";
 import path from "node:path";
 
-export function createAgyWindow(dirname: string): BrowserWindow {
+export function createOverlayWindow(dirname: string): BrowserWindow {
   const { x, y, width, height } = screen.getPrimaryDisplay().bounds;
 
   const win = new BrowserWindow({
@@ -36,7 +36,7 @@ export function createAgyWindow(dirname: string): BrowserWindow {
 /**
  * Reposition the overlay to the display where the cursor is and show it.
  */
-export function showAgyOnCursorDisplay(win: BrowserWindow): void {
+export function showOverlayOnCursorDisplay(win: BrowserWindow): void {
   const cursor = screen.getCursorScreenPoint();
   const display = screen.getDisplayNearestPoint(cursor);
   const { x, y, width, height } = display.bounds;

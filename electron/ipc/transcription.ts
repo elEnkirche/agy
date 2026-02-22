@@ -43,7 +43,7 @@ function createWavBuffer(pcmData: Buffer): Uint8Array {
 
 function sendBatch(
   getAppWindow: () => BrowserWindow | null,
-  getAgyWindow: () => BrowserWindow | null,
+  getOverlayWindow: () => BrowserWindow | null,
   wavData: Uint8Array,
   isFinal: boolean,
 ) {
@@ -60,7 +60,7 @@ function sendBatch(
         result.text,
         isFinal,
       );
-      getAgyWindow()?.webContents.send(
+      getOverlayWindow()?.webContents.send(
         "transcription-confirmed",
         result.text,
         isFinal,
@@ -71,7 +71,7 @@ function sendBatch(
       console.error(`[batch${isFinal ? " final" : ""}] Failed:`, err);
       if (isFinal) {
         getAppWindow()?.webContents.send("transcription-confirmed-error");
-        getAgyWindow()?.webContents.send("transcription-confirmed-error");
+        getOverlayWindow()?.webContents.send("transcription-confirmed-error");
       }
     });
 }
@@ -86,7 +86,7 @@ function clearBatchInterval() {
 
 export function registerTranscriptionHandlers(
   getAppWindow: () => BrowserWindow | null,
-  getAgyWindow: () => BrowserWindow | null,
+  getOverlayWindow: () => BrowserWindow | null,
 ) {
   ipcMain.handle("start-transcription", async () => {
     if (activeConnection && !activeConnection.isClosed)
@@ -113,7 +113,7 @@ export function registerTranscriptionHandlers(
           if (!appWindow) break;
           if (event.type === "transcription.text.delta" && "text" in event) {
             appWindow.webContents.send("transcription-delta", event.text);
-            getAgyWindow()?.webContents.send("transcription-delta", event.text);
+            getOverlayWindow()?.webContents.send("transcription-delta", event.text);
           } else if (event.type === "transcription.done" && "text" in event)
             appWindow.webContents.send("transcription-done", event.text);
           else if (event.type === "error") {
@@ -144,7 +144,7 @@ export function registerTranscriptionHandlers(
       batchInFlight = true;
       const pcmData = Buffer.concat(audioChunks);
       const wavData = createWavBuffer(pcmData);
-      sendBatch(getAppWindow, getAgyWindow, wavData, false);
+      sendBatch(getAppWindow, getOverlayWindow, wavData, false);
     }, BATCH_INTERVAL_MS);
   });
 
@@ -172,6 +172,6 @@ export function registerTranscriptionHandlers(
     const pcmData = Buffer.concat(chunks);
     const wavData = createWavBuffer(pcmData);
 
-    sendBatch(getAppWindow, getAgyWindow, wavData, true);
+    sendBatch(getAppWindow, getOverlayWindow, wavData, true);
   });
 }

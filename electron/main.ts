@@ -2,7 +2,7 @@ import "dotenv/config";
 import { app, BrowserWindow, ipcMain, nativeTheme } from "electron";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { createAppWindow, createAgyWindow, showAgyOnCursorDisplay } from "./window/index.js";
+import { createAppWindow, createOverlayWindow, showOverlayOnCursorDisplay } from "./window/index.js";
 import { registerTranscriptionHandlers } from "./ipc/transcription.js";
 import { registerChatHandlers } from "./ipc/chat.js";
 import { registerSettingsHandlers } from "./ipc/settings.js";
@@ -17,26 +17,26 @@ import { loadSettings } from "./lib/settings.js";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 let appWindow: BrowserWindow | null = null;
-let agyWindow: BrowserWindow | null = null;
+let overlayWindow: BrowserWindow | null = null;
 
 const getAppWindow = () => appWindow;
-const getAgyWindow = () => agyWindow;
+const getOverlayWindow = () => overlayWindow;
 
-registerTranscriptionHandlers(getAppWindow, getAgyWindow);
-registerChatHandlers(getAppWindow, getAgyWindow);
+registerTranscriptionHandlers(getAppWindow, getOverlayWindow);
+registerChatHandlers(getAppWindow, getOverlayWindow);
 registerSettingsHandlers();
 registerPermissionsHandlers();
 registerPushToTalk(getAppWindow);
 
 ipcMain.handle("set-recording-glow", (_event, active: boolean) => {
-  if (active && agyWindow && !agyWindow.isDestroyed() && !agyWindow.isVisible())
-    showAgyOnCursorDisplay(agyWindow);
-  agyWindow?.webContents.send("recording-glow", active);
+  if (active && overlayWindow && !overlayWindow.isDestroyed() && !overlayWindow.isVisible())
+    showOverlayOnCursorDisplay(overlayWindow);
+  overlayWindow?.webContents.send("recording-glow", active);
 });
 
 ipcMain.on("hide-overlay", () => {
-  if (agyWindow && !agyWindow.isDestroyed() && agyWindow.isVisible())
-    agyWindow.hide();
+  if (overlayWindow && !overlayWindow.isDestroyed() && overlayWindow.isVisible())
+    overlayWindow.hide();
 });
 
 app.whenReady().then(() => {
@@ -45,16 +45,16 @@ app.whenReady().then(() => {
   setPushToTalkKey(settings.hotkey.keycode);
 
   appWindow = createAppWindow(__dirname);
-  agyWindow = createAgyWindow(__dirname);
+  overlayWindow = createOverlayWindow(__dirname);
 
-  agyWindow.on("closed", () => {
-    agyWindow = null;
+  overlayWindow.on("closed", () => {
+    overlayWindow = null;
   });
 
   app.on("activate", () => {
     if (BrowserWindow.getAllWindows().length === 0) {
       appWindow = createAppWindow(__dirname);
-      agyWindow = createAgyWindow(__dirname);
+      overlayWindow = createOverlayWindow(__dirname);
     }
   });
 });
