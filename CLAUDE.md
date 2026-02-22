@@ -6,17 +6,17 @@ AGY is a macOS vocal assistant that controls your desktop through voice commands
 
 ## Tech Stack
 
-| Layer            | Technology                                         |
-| ---------------- | -------------------------------------------------- |
-| Desktop          | Electron 40                                        |
-| Frontend         | React 19, TypeScript 5.9                           |
-| Bundler          | Vite 7 + `vite-plugin-electron`                    |
-| Styling          | Tailwind CSS 4, shadcn/ui (base-mira style)        |
-| AI               | Mistral AI SDK (`@mistralai/mistralai`)            |
-| Voice            | `voxtral-mini-latest` (batch) + `voxtral-mini-transcribe-realtime-2602` (streaming WS) |
-| Chat model       | `mistral-large-latest` (vision + tool use)         |
-| Global hotkeys   | `uiohook-napi`                                     |
-| Package manager  | pnpm                                               |
+| Layer           | Technology                                                                             |
+| --------------- | -------------------------------------------------------------------------------------- |
+| Desktop         | Electron 40                                                                            |
+| Frontend        | React 19, TypeScript 5.9                                                               |
+| Bundler         | Vite 7 + `vite-plugin-electron`                                                        |
+| Styling         | Tailwind CSS 4, shadcn/ui (base-mira style)                                            |
+| AI              | Mistral AI SDK (`@mistralai/mistralai`)                                                |
+| Voice           | `voxtral-mini-latest` (batch) + `voxtral-mini-transcribe-realtime-2602` (streaming WS) |
+| Chat model      | `mistral-large-latest` (vision + tool use)                                             |
+| Global hotkeys  | `uiohook-napi`                                                                         |
+| Package manager | pnpm                                                                                   |
 
 ## Architecture
 
@@ -63,6 +63,7 @@ All macOS-specific. The agentic loop runs up to 10 iterations of tool calls befo
 ## Context Capture (`electron/lib/context.ts`)
 
 Before each chat, captures:
+
 - Frontmost application name (AppleScript)
 - Browser URL/title if Chrome/Safari/Arc/Firefox/Edge is active
 - Screenshot → base64 PNG (via `screencapture -x`)
@@ -70,6 +71,7 @@ Before each chat, captures:
 ## Settings (`electron/lib/settings.ts`)
 
 JSON file at `app.getPath("userData")/settings.json`. Three sections:
+
 - `audio`: deviceId
 - `hotkey`: keycode (default: Right Alt / 3640), keyName, mode (hold/toggle)
 - `appearance`: theme (system/light/dark)
