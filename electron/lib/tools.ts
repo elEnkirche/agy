@@ -255,7 +255,7 @@ export const toolDefinitions: Tool[] = [
     function: {
       name: "browser_action",
       description:
-        "Control a visible Chrome browser with the user's profile (logged-in sessions preserved). The browser persists across calls within the same conversation. Workflow: open URL → state (get clickable element indices) → interact using indices (click, input, select) → state again to verify. Always run 'state' before interacting to get fresh element indices.",
+        "Control a visible headed Chrome browser with the user's real profile (logged-in sessions preserved). The browser window is visible on screen. It persists across calls within the same conversation. Workflow: open URL → state (get clickable element indices) → interact using indices (click, input, select) → state again to verify. Always run 'state' before interacting to get fresh element indices.",
       parameters: {
         type: "object",
         properties: {
@@ -416,7 +416,7 @@ const executors: Record<string, (args: ToolArgs) => Promise<string>> = {
     const command = args.command as string;
     const argv = parseCommandArgs(command);
     const bin = "browser-use";
-    const fullArgs = ["--browser", "real", "--profile", "Default", ...argv];
+    const fullArgs = ["--browser", "real", "--profile", "Default", "--headed", ...argv];
 
     console.log(`[browser_action] > ${bin} ${fullArgs.join(" ")}`);
     const startTime = Date.now();
