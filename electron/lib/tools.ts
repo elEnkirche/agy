@@ -250,6 +250,25 @@ export const toolDefinitions: Tool[] = [
       },
     },
   },
+  {
+    type: "function",
+    function: {
+      name: "browser_action",
+      description:
+        "Control the user's Chrome browser via agent-browser CLI. Connects to Chrome's remote debugging port. Use this for web tasks like navigating, clicking, filling forms, reading page content. Workflow: open URL → snapshot -i (get interactive element refs like @e1) → interact using refs → re-snapshot after navigation/DOM changes. Refs are invalidated on page change — always re-snapshot.",
+      parameters: {
+        type: "object",
+        properties: {
+          command: {
+            type: "string",
+            description:
+              'The agent-browser subcommand and arguments. Examples: \'open https://gmail.com\', \'snapshot -i\', \'click @e1\', \'fill @e2 "some text"\', \'wait --load networkidle\', \'get text @e3\', \'screenshot\'',
+          },
+        },
+        required: ["command"],
+      },
+    },
+  },
 ];
 
 // ─── Tool Executors ───────────────────────────────────────────────────────────
@@ -392,7 +411,65 @@ const executors: Record<string, (args: ToolArgs) => Promise<string>> = {
     const script = args.script as string;
     return runAppleScript(script);
   },
+
+  async browser_action(args) {
+    const command = args.command as string;
+    const argv = parseCommandArgs(command);
+    const bin = "agent-browser";
+
+    console.log(`[browser_action] > ${bin} ${command}`);
+    const startTime = Date.now();
+
+    try {
+      const { stdout, stderr } = await execFile(bin, argv, {
+        timeout: 30_000,
+      });
+      const elapsed = Date.now() - startTime;
+      const output = (stdout || stderr).trim();
+      console.log(
+        `[browser_action] ✓ completed in ${elapsed}ms (${output.length} chars)`,
+      );
+      console.log(
+        `[browser_action] output: ${output.slice(0, 500)}${output.length > 500 ? "…" : ""}`,
+      );
+      return output || "(no output)";
+    } catch (err) {
+      const elapsed = Date.now() - startTime;
+      const message = err instanceof Error ? err.message : String(err);
+      console.error(`[browser_action] ✗ failed after ${elapsed}ms: ${message}`);
+      throw err;
+    }
+  },
 };
+
+/** Parse a command string into argv, respecting quoted arguments. */
+function parseCommandArgs(command: string): string[] {
+  const args: string[] = [];
+  let current = "";
+  let inQuote: string | null = null;
+
+  for (let i = 0; i < command.length; i++) {
+    const char = command[i];
+    if (inQuote) {
+      if (char === inQuote) {
+        inQuote = null;
+      } else {
+        current += char;
+      }
+    } else if (char === '"' || char === "'") {
+      inQuote = char;
+    } else if (char === " ") {
+      if (current) {
+        args.push(current);
+        current = "";
+      }
+    } else {
+      current += char;
+    }
+  }
+  if (current) args.push(current);
+  return args;
+}
 
 // ─── Public API ───────────────────────────────────────────────────────────────
 
