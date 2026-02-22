@@ -255,14 +255,14 @@ export const toolDefinitions: Tool[] = [
     function: {
       name: "browser_action",
       description:
-        "Control the user's Chrome browser via agent-browser CLI. Connects to Chrome's remote debugging port. Use this for web tasks like navigating, clicking, filling forms, reading page content. Workflow: open URL → snapshot -i (get interactive element refs like @e1) → interact using refs → re-snapshot after navigation/DOM changes. Refs are invalidated on page change — always re-snapshot.",
+        "Control a visible Chrome browser with the user's profile (logged-in sessions preserved). The browser persists across calls within the same conversation. Workflow: open URL → state (get clickable element indices) → interact using indices (click, input, select) → state again to verify. Always run 'state' before interacting to get fresh element indices.",
       parameters: {
         type: "object",
         properties: {
           command: {
             type: "string",
             description:
-              'The agent-browser subcommand and arguments. Examples: \'open https://gmail.com\', \'snapshot -i\', \'click @e1\', \'fill @e2 "some text"\', \'wait --load networkidle\', \'get text @e3\', \'screenshot\'',
+              'The browser-use command and arguments. Examples: \'open https://gmail.com\', \'state\', \'click 5\', \'input 3 "some text"\', \'keys "Enter"\', \'select 7 "option"\', \'scroll down\', \'back\', \'screenshot page.png\', \'wait text "Inbox"\', \'eval "document.title"\'',
           },
         },
         required: ["command"],
@@ -415,14 +415,15 @@ const executors: Record<string, (args: ToolArgs) => Promise<string>> = {
   async browser_action(args) {
     const command = args.command as string;
     const argv = parseCommandArgs(command);
-    const bin = "agent-browser";
+    const bin = "browser-use";
+    const fullArgs = ["--browser", "real", "--profile", "Default", ...argv];
 
-    console.log(`[browser_action] > ${bin} ${command}`);
+    console.log(`[browser_action] > ${bin} ${fullArgs.join(" ")}`);
     const startTime = Date.now();
 
     try {
-      const { stdout, stderr } = await execFile(bin, argv, {
-        timeout: 30_000,
+      const { stdout, stderr } = await execFile(bin, fullArgs, {
+        timeout: 60_000,
       });
       const elapsed = Date.now() - startTime;
       const output = (stdout || stderr).trim();
