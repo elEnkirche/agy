@@ -38,6 +38,9 @@ export function registerChatHandlers(
         // Capture fresh context each iteration (screenshot + focused app + URL)
         const ctx = await captureContext();
 
+        // Build context text with screen dimensions for precise click_at coordinates
+        const screenInfo = `${ctx.text}\n[Context] Screen size: ${ctx.displayWidth}x${ctx.displayHeight} — the screenshot image matches these dimensions exactly. Use coordinates within this range for click_at.`;
+
         // First iteration: attach context to the user message
         // Subsequent iterations: inject as a fresh context message so the model
         // always sees the current screen state after tool execution
@@ -51,7 +54,7 @@ export function registerChatHandlers(
                   url: `data:image/png;base64,${ctx.screenshotBase64}`,
                 },
               },
-              { type: "text" as const, text: `${ctx.text}\n\n${prompt}` },
+              { type: "text" as const, text: `${screenInfo}\n\n${prompt}` },
             ],
           });
         } else {
@@ -66,7 +69,7 @@ export function registerChatHandlers(
               },
               {
                 type: "text" as const,
-                text: `${ctx.text}\n\n[Updated screenshot after previous actions. Continue the task.]`,
+                text: `${screenInfo}\n\n[Updated screenshot after previous actions. Continue the task.]`,
               },
             ],
           });

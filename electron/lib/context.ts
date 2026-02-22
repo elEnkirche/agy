@@ -22,6 +22,8 @@ export interface CapturedContext {
   text: string;
   screenshotBase64: string;
   screenshotPath: string;
+  displayWidth: number;
+  displayHeight: number;
 }
 
 /**
@@ -37,12 +39,16 @@ export async function captureContext(): Promise<CapturedContext> {
 
   console.log("[context] captured:");
   console.log(text);
-  console.log(`[context] screenshot: ${screenshot.filePath}`);
+  console.log(
+    `[context] screenshot: ${screenshot.filePath} (${screenshot.width}x${screenshot.height} points)`,
+  );
 
   return {
     text,
     screenshotBase64: screenshot.base64,
     screenshotPath: screenshot.filePath,
+    displayWidth: screenshot.width,
+    displayHeight: screenshot.height,
   };
 }
 
@@ -95,6 +101,8 @@ async function gatherTextContext(): Promise<string> {
 interface ScreenCapture {
   base64: string;
   filePath: string;
+  width: number;
+  height: number;
 }
 
 async function captureScreen(): Promise<ScreenCapture> {
@@ -110,6 +118,20 @@ async function captureScreen(): Promise<ScreenCapture> {
     `${x},${y},${width},${height}`,
     filePath,
   ]);
+
+  // Resize to logical (point) coordinates so the image maps 1:1 to
+  // cliclick / macOS screen coordinates (Retina displays capture at 2x)
+  const scaleFactor = display.scaleFactor ?? 1;
+  if (scaleFactor > 1) {
+    await execFile("sips", [
+      "--resampleWidth",
+      String(width),
+      filePath,
+      "--out",
+      filePath,
+    ]);
+  }
+
   const buf = await readFile(filePath);
-  return { base64: buf.toString("base64"), filePath };
+  return { base64: buf.toString("base64"), filePath, width, height };
 }
