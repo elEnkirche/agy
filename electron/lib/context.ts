@@ -38,7 +38,7 @@ export async function captureContext(): Promise<CapturedContext> {
   ]);
 
   const text =
-    `${appContext}\n[Context] Screen size: ${screenshot.width}x${screenshot.height} pixels (top-left is 0,0)`;
+    `${appContext}\n[Context] Screen size: ${screenshot.width}x${screenshot.height} pixels (top-left is 0,0)\n[Context] Cursor position: (${screenshot.cursorX}, ${screenshot.cursorY})`;
 
   console.log("[context] captured:");
   console.log(text);
@@ -106,6 +106,8 @@ interface ScreenCapture {
   filePath: string;
   width: number;
   height: number;
+  cursorX: number;
+  cursorY: number;
 }
 
 async function captureScreen(): Promise<ScreenCapture> {
@@ -136,5 +138,8 @@ async function captureScreen(): Promise<ScreenCapture> {
   }
 
   const buf = await readFile(filePath);
-  return { base64: buf.toString("base64"), filePath, width, height };
+  // Cursor position relative to the captured display
+  const cursorX = cursor.x - x;
+  const cursorY = cursor.y - y;
+  return { base64: buf.toString("base64"), filePath, width, height, cursorX, cursorY };
 }
