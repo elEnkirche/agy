@@ -334,7 +334,9 @@ const executors: Record<string, (args: ToolArgs) => Promise<string>> = {
         cmd = `c:${x},${y}`;
     }
 
+    console.log(`[click_at] ${button} click at (${x}, ${y}) → cliclick ${cmd}`);
     await execFile("cliclick", [cmd]);
+    console.log(`[click_at] done`);
     return `Clicked ${button} at (${x}, ${y})`;
   },
 

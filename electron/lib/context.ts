@@ -32,10 +32,13 @@ export interface CapturedContext {
  * in screenshots — no need to hide/show it.
  */
 export async function captureContext(): Promise<CapturedContext> {
-  const [text, screenshot] = await Promise.all([
+  const [appContext, screenshot] = await Promise.all([
     gatherTextContext(),
     captureScreen(),
   ]);
+
+  const text =
+    `${appContext}\n[Context] Screen size: ${screenshot.width}x${screenshot.height} pixels (top-left is 0,0)`;
 
   console.log("[context] captured:");
   console.log(text);
