@@ -28,7 +28,7 @@ AGY is a macOS vocal assistant that controls your desktop through voice commands
 │              │             permissions.ts          settings.ts │
 │              │                                     tools.ts   │
 │              └── window/ ── app.ts (settings)                 │
-│                             agy.ts (overlay)                  │
+│                             overlay.ts (overlay)              │
 └───────────────────────────┬───────────────────────────────────┘
                       IPC (preload.ts)
 ┌───────────────────────────┴───────────────────────────────────┐
