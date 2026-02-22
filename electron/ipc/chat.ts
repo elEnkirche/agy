@@ -29,27 +29,49 @@ export function registerChatHandlers(
 
     sendOverlay("glow-phase", "thinking");
 
-    // Capture context (overlay is content-protected, won't appear in screenshot)
-    const ctx = await captureContext();
-
     const messages: ChatCompletionStreamRequestMessages[] = [
-      { role: "system", content: SYSTEM_PROMPT + "\n\n" + ctx.text },
-      {
-        role: "user",
-        content: [
-          {
-            type: "image_url" as const,
-            imageUrl: {
-              url: `data:image/png;base64,${ctx.screenshotBase64}`,
-            },
-          },
-          { type: "text" as const, text: prompt },
-        ],
-      },
+      { role: "system", content: SYSTEM_PROMPT },
     ];
 
     try {
       for (let iteration = 0; iteration < MAX_AGENTIC_ITERATIONS; iteration++) {
+        // Capture fresh context each iteration (screenshot + focused app + URL)
+        const ctx = await captureContext();
+
+        // First iteration: attach context to the user message
+        // Subsequent iterations: inject as a fresh context message so the model
+        // always sees the current screen state after tool execution
+        if (iteration === 0) {
+          messages.push({
+            role: "user",
+            content: [
+              {
+                type: "image_url" as const,
+                imageUrl: {
+                  url: `data:image/png;base64,${ctx.screenshotBase64}`,
+                },
+              },
+              { type: "text" as const, text: `${ctx.text}\n\n${prompt}` },
+            ],
+          });
+        } else {
+          messages.push({
+            role: "user",
+            content: [
+              {
+                type: "image_url" as const,
+                imageUrl: {
+                  url: `data:image/png;base64,${ctx.screenshotBase64}`,
+                },
+              },
+              {
+                type: "text" as const,
+                text: `${ctx.text}\n\n[Updated screenshot after previous actions. Continue the task.]`,
+              },
+            ],
+          });
+        }
+
         const stream = await mistral.chat.stream({
           model: "mistral-large-latest",
           messages,
@@ -125,17 +147,9 @@ export function registerChatHandlers(
         );
 
         for (const { toolCallId, result } of toolResults) {
-          const isImage = result.result.startsWith("data:image/");
           messages.push({
             role: "tool",
-            content: isImage
-              ? [
-                  {
-                    type: "image_url" as const,
-                    imageUrl: { url: result.result },
-                  },
-                ]
-              : result.result,
+            content: result.result,
             toolCallId,
             name: result.name,
           });

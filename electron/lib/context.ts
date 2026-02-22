@@ -97,7 +97,7 @@ interface ScreenCapture {
   filePath: string;
 }
 
-export async function captureScreen(): Promise<ScreenCapture> {
+async function captureScreen(): Promise<ScreenCapture> {
   const cursor = screen.getCursorScreenPoint();
   const display = screen.getDisplayNearestPoint(cursor);
   const { x, y, width, height } = display.bounds;

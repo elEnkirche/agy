@@ -4,7 +4,6 @@ import os from "node:os";
 import path from "node:path";
 import { promisify } from "node:util";
 import type { Tool } from "@mistralai/mistralai/models/components/tool.js";
-import { captureScreen } from "./context.js";
 
 const execFile = promisify(execFileCb);
 
@@ -139,21 +138,9 @@ export const toolDefinitions: Tool[] = [
   {
     type: "function",
     function: {
-      name: "take_screenshot",
-      description:
-        "Capture a screenshot of the entire screen and return it as an image. Use this after performing UI actions to verify they worked.",
-      parameters: {
-        type: "object",
-        properties: {},
-      },
-    },
-  },
-  {
-    type: "function",
-    function: {
       name: "click_at",
       description:
-        "Click at specific screen coordinates (x, y). Use after taking a screenshot to identify the position of UI elements to click.",
+        "Click at specific screen coordinates (x, y). A fresh screenshot is automatically provided at each step, use it to identify the position of UI elements to click.",
       parameters: {
         type: "object",
         properties: {
@@ -328,11 +315,6 @@ const executors: Record<string, (args: ToolArgs) => Promise<string>> = {
     // macOS volume is 0-100 in AppleScript
     await runAppleScript(`set volume output volume ${level}`);
     return `Volume set to ${level}%`;
-  },
-
-  async take_screenshot() {
-    const { base64 } = await captureScreen();
-    return `data:image/png;base64,${base64}`;
   },
 
   async click_at(args) {

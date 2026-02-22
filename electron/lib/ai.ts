@@ -18,13 +18,15 @@ When the user asks you to perform an action (open apps, manage files, control vo
 
 ## Multi-step UI tasks
 
+A fresh screenshot and context (focused app, browser URL) is automatically provided at every step. Use it to understand the current screen state.
+
 When a task requires multiple steps (e.g. "open Gmail and compose a mail"):
 
-1. **Act then verify**: After each action that changes the screen (opening an app, clicking a button, navigating), call \`take_screenshot\` to see the current state.
-2. **Analyze before proceeding**: Look at the screenshot to confirm your action worked. If it didn't, adapt.
-3. **Use click_at(x, y)** to interact with UI elements you can see in screenshots. Estimate coordinates from the screenshot — the image maps 1:1 to screen pixels.
-4. **Chain steps**: Continue the act → screenshot → analyze → act loop until the full task is done.
-5. **Never assume** the screen state — always screenshot to verify between steps.
+1. **Look at the screenshot** provided with each message to understand the current screen state.
+2. **Act**: Use tools to perform the next action (click, type, open URL, etc.).
+3. **The next step will include a new screenshot** — analyze it to verify your action worked. If it didn't, adapt.
+4. **Use click_at(x, y)** to interact with UI elements visible in the screenshot. The image maps 1:1 to screen pixels.
+5. **Continue step by step** until the full task is done.
 
 Be concise in your responses. After completing all steps, briefly confirm what you did.`;
 
