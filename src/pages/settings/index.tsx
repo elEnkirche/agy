@@ -1,18 +1,18 @@
 import { useState, useEffect } from "react";
-import type { Status, ToolAction } from "@/components/transcription/types";
+import type { Status, ToolAction } from "@/types/transcription";
 import {
   useAudioRecording,
   useAssistantListeners,
   usePushToTalk,
-} from "@/hooks/transcription";
-import { useSettings } from "@/hooks/use-settings";
+} from "./hooks";
+import { useSettings } from "./hooks/use-settings";
 import {
   SettingsLayout,
   AudioSection,
   HotkeySection,
   AppearanceSection,
   PermissionsSection,
-} from "@/components/settings";
+} from "./components";
 
 export function App() {
   const { settings, loaded, updateAudio, updateHotkey, updateAppearance } =

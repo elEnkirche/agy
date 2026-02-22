@@ -11,8 +11,8 @@ import {
   registerPushToTalk,
   setPushToTalkKey,
   stopPushToTalk,
-} from "./push-to-talk.js";
-import { loadSettings } from "./settings.js";
+} from "./lib/push-to-talk.js";
+import { loadSettings } from "./lib/settings.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 

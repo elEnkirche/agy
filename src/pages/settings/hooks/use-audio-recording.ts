@@ -1,6 +1,6 @@
 import { useCallback, useRef } from "react";
-import { float32ToPcmS16le } from "@/lib/audio";
-import type { Status } from "@/components/transcription/types";
+import { float32ToPcmS16le } from "@/utils/audio";
+import type { Status } from "@/types/transcription";
 
 export function useAudioRecording(
   selectedDeviceId: string | null,

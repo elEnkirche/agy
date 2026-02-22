@@ -4,14 +4,14 @@ import {
   updateAudioSettings,
   updateHotkeySettings,
   updateAppearanceSettings,
-} from "../settings.js";
-import type { AppSettings } from "../settings.js";
+} from "../lib/settings.js";
+import type { AppSettings } from "../lib/settings.js";
 import {
   setPushToTalkKey,
   startHotkeyCapture,
   cancelHotkeyCapture,
-} from "../push-to-talk.js";
-import { getKeyName } from "../key-names.js";
+} from "../lib/push-to-talk.js";
+import { getKeyName } from "../const/key-names.js";
 
 export function registerSettingsHandlers(): void {
   ipcMain.handle("get-settings", () => getSettings());

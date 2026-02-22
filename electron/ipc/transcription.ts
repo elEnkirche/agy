@@ -2,7 +2,7 @@ import type { BrowserWindow } from "electron";
 import { ipcMain } from "electron";
 import { AudioEncoding } from "@mistralai/mistralai/extra/realtime";
 import type { RealtimeConnection } from "@mistralai/mistralai/extra/realtime";
-import { mistral, realtimeClient } from "../ai.js";
+import { mistral, realtimeClient } from "../lib/ai.js";
 
 let activeConnection: RealtimeConnection | null = null;
 let audioChunks: Buffer[] = [];

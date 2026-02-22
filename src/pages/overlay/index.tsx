@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Mic, Sparkles, Cog } from "lucide-react";
-import "./agy-overlay.css";
+import "./overlay.css";
 import "./markdown.css";
 
 type Phase = "idle" | "recording" | "thinking" | "executing" | "responding";

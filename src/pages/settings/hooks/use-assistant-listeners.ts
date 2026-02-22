@@ -1,6 +1,6 @@
 import type { Dispatch, SetStateAction } from "react";
 import { useEffect } from "react";
-import type { Status, ToolAction } from "@/components/transcription/types";
+import type { Status, ToolAction } from "@/types/transcription";
 
 export function useAssistantListeners(
   setTranscript: Dispatch<SetStateAction<string>>,

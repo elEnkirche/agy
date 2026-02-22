@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import type { Status } from "@/components/transcription/types";
+import type { Status } from "@/types/transcription";
 
 export function usePushToTalk(
   status: Status,

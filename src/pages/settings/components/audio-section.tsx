@@ -1,4 +1,4 @@
-import { useAudioDevices } from "@/hooks/transcription";
+import { useAudioDevices } from "../hooks";
 import { Label } from "@/components/ui/label";
 import {
   Select,

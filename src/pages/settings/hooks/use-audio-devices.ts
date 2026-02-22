@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import type { AudioDevice } from "@/components/transcription/types";
+import type { AudioDevice } from "@/types/transcription";
 
 export function useAudioDevices() {
   const [devices, setDevices] = useState<AudioDevice[]>([]);

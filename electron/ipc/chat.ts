@@ -7,9 +7,9 @@ import {
   SYSTEM_PROMPT,
   MAX_AGENTIC_ITERATIONS,
   parseToolCallArgs,
-} from "../ai.js";
-import { toolDefinitions, executeTool } from "../tools.js";
-import { captureContext } from "../context.js";
+} from "../lib/ai.js";
+import { toolDefinitions, executeTool } from "../lib/tools.js";
+import { captureContext } from "../lib/context.js";
 import { showAgyOnCursorDisplay } from "../window/agy.js";
 
 export function registerChatHandlers(
