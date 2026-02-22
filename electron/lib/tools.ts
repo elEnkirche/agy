@@ -140,7 +140,7 @@ export const toolDefinitions: Tool[] = [
     function: {
       name: "click_at",
       description:
-        "Click at specific screen coordinates (x, y). A fresh screenshot is automatically provided at each step, use it to identify the position of UI elements to click.",
+        "Click at specific screen coordinates (x, y) for native macOS app interactions only. Do NOT use for browser/web interactions — use browser_action instead. A fresh screenshot is automatically provided at each step, use it to identify the position of UI elements to click.",
       parameters: {
         type: "object",
         properties: {
