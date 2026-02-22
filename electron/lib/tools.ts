@@ -4,6 +4,7 @@ import os from "node:os";
 import path from "node:path";
 import { promisify } from "node:util";
 import type { Tool } from "@mistralai/mistralai/models/components/tool.js";
+import { captureScreen } from "./context.js";
 
 const execFile = promisify(execFileCb);
 
@@ -330,13 +331,8 @@ const executors: Record<string, (args: ToolArgs) => Promise<string>> = {
   },
 
   async take_screenshot() {
-    const filePath = path.join(
-      os.tmpdir(),
-      `agy-screenshot-${Date.now()}.png`,
-    );
-    await execFile("screencapture", ["-x", filePath]);
-    const buf = await readFile(filePath);
-    return `data:image/png;base64,${buf.toString("base64")}`;
+    const { base64 } = await captureScreen();
+    return `data:image/png;base64,${base64}`;
   },
 
   async click_at(args) {
