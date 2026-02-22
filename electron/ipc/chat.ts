@@ -125,9 +125,17 @@ export function registerChatHandlers(
         );
 
         for (const { toolCallId, result } of toolResults) {
+          const isImage = result.result.startsWith("data:image/");
           messages.push({
             role: "tool",
-            content: result.result,
+            content: isImage
+              ? [
+                  {
+                    type: "image_url" as const,
+                    imageUrl: { url: result.result },
+                  },
+                ]
+              : result.result,
             toolCallId,
             name: result.name,
           });

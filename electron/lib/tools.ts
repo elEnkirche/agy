@@ -139,10 +139,38 @@ export const toolDefinitions: Tool[] = [
     type: "function",
     function: {
       name: "take_screenshot",
-      description: "Capture a screenshot of the entire screen",
+      description:
+        "Capture a screenshot of the entire screen and return it as an image. Use this after performing UI actions to verify they worked.",
       parameters: {
         type: "object",
         properties: {},
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "click_at",
+      description:
+        "Click at specific screen coordinates (x, y). Use after taking a screenshot to identify the position of UI elements to click.",
+      parameters: {
+        type: "object",
+        properties: {
+          x: {
+            type: "number",
+            description: "X coordinate (pixels from left edge of screen)",
+          },
+          y: {
+            type: "number",
+            description: "Y coordinate (pixels from top edge of screen)",
+          },
+          button: {
+            type: "string",
+            description:
+              "Mouse button to click: 'left' (default), 'right', or 'double'",
+          },
+        },
+        required: ["x", "y"],
       },
     },
   },
@@ -303,12 +331,33 @@ const executors: Record<string, (args: ToolArgs) => Promise<string>> = {
 
   async take_screenshot() {
     const filePath = path.join(
-      os.homedir(),
-      "Desktop",
-      `screenshot-${Date.now()}.png`,
+      os.tmpdir(),
+      `agy-screenshot-${Date.now()}.png`,
     );
     await execFile("screencapture", ["-x", filePath]);
-    return `Screenshot saved to ${filePath}`;
+    const buf = await readFile(filePath);
+    return `data:image/png;base64,${buf.toString("base64")}`;
+  },
+
+  async click_at(args) {
+    const x = Math.round(args.x as number);
+    const y = Math.round(args.y as number);
+    const button = (args.button as string) ?? "left";
+
+    let cmd: string;
+    switch (button) {
+      case "right":
+        cmd = `rc:${x},${y}`;
+        break;
+      case "double":
+        cmd = `dc:${x},${y}`;
+        break;
+      default:
+        cmd = `c:${x},${y}`;
+    }
+
+    await execFile("cliclick", [cmd]);
+    return `Clicked ${button} at (${x}, ${y})`;
   },
 
   async type_text(args) {
