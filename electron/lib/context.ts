@@ -114,32 +114,49 @@ async function captureScreen(): Promise<ScreenCapture> {
   const cursor = screen.getCursorScreenPoint();
   const display = screen.getDisplayNearestPoint(cursor);
   const { x, y, width, height } = display.bounds;
-
   const filePath = path.join(tmpdir(), `agy-ctx-${Date.now()}.png`);
-  await execFile("screencapture", [
-    "-x",
-    "-C",
-    "-R",
-    `${x},${y},${width},${height}`,
-    filePath,
-  ]);
+  const platform = process.platform;
 
-  // Resize to logical (point) coordinates so the image maps 1:1 to
-  // cliclick / macOS screen coordinates (Retina displays capture at 2x)
-  const scaleFactor = display.scaleFactor ?? 1;
-  if (scaleFactor > 1) {
-    await execFile("sips", [
-      "--resampleWidth",
-      String(width),
-      filePath,
-      "--out",
+  if (platform === "darwin") {
+    await execFile("screencapture", [
+      "-x", "-C", "-R",
+      `${x},${y},${width},${height}`,
       filePath,
     ]);
+    const scaleFactor = display.scaleFactor ?? 1;
+    if (scaleFactor > 1) {
+      await execFile("sips", [
+        "--resampleWidth", String(width),
+        filePath, "--out", filePath,
+      ]);
+    }
+
+  } else if (platform === "linux") {
+    await execFile("scrot", [
+      "-a", `${x},${y},${width},${height}`,
+      filePath,
+    ]);
+
+  } else if (platform === "win32") {
+    const psScript = `
+      Add-Type -AssemblyName System.Windows.Forms
+      Add-Type -AssemblyName System.Drawing
+      $bmp = New-Object System.Drawing.Bitmap(${width}, ${height})
+      $g = [System.Drawing.Graphics]::FromImage($bmp)
+      $g.CopyFromScreen(${x}, ${y}, 0, 0, $bmp.Size)
+      $bmp.Save('${filePath.replace(/\\/g, "\\\\")}')
+      $g.Dispose()
+      $bmp.Dispose()
+    `;
+    await execFile("powershell", ["-NoProfile", "-Command", psScript]);
+
+  } else {
+    throw new Error(`Plateforme non supportée : ${platform}`);
   }
 
   const buf = await readFile(filePath);
-  // Cursor position relative to the captured display
   const cursorX = cursor.x - x;
   const cursorY = cursor.y - y;
+
   return { base64: buf.toString("base64"), filePath, width, height, cursorX, cursorY };
 }
